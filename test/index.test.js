@@ -112,11 +112,11 @@ describe("Checking application main endpoints", () => {
 
     })
     it("should test that when we edit /products/:id, the description can only be a string", async () => {
+
         const unValidData = {
             description: 123,
             price: 30
         }
-
 
         const productResponse = await request.post("/products").send(validData)
         const response = await request.put(`/products/${productResponse.body._id}`).send(unValidData)
@@ -126,7 +126,7 @@ describe("Checking application main endpoints", () => {
 })
 
 beforeAll((done) => {
-    console.log(process.env.ATLAS_URL)
+
     mongoose
         .connect(process.env.ATLAS_URL + "/test", { useNewUrlParser: true })
         .then(() => {
