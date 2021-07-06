@@ -92,14 +92,37 @@ describe("Checking application main endpoints", () => {
     it("should test that the /products/:id endpoint is returning 404 if the id is missing", async () => {
         const productResponse = await request.post("/products").send(validData)
 
-        const response = await request.get(`/products/${productResponse._id}`)
-
-
-
-        expect(response).toBeDefined()
+        const response = await request.get(`/products/1234`)
+        expect(response.status).toBe(404)
 
     })
 
+    it("should test that when /products/:id is deleted , it returns status code 204", async () => {
+        const productResponse = await request.post("/products").send(validData)
+        console.log(productResponse.body._id)
+        const response = await request.delete(`/products/${productResponse.body._id}`)
+        expect(response.status).toBe(204)
+
+    })
+    it("should test that when we edit /products/:id, the description is changed ", async () => {
+
+        const productResponse = await request.post("/products").send(validData)
+        const response = await request.put(`/products/${productResponse.body._id}`).send(validData)
+        expect(response.status).toBe(400)
+
+    })
+    it("should test that when we edit /products/:id, the description can only be a string", async () => {
+        const unValidData = {
+            description: 123,
+            price: 30
+        }
+
+
+        const productResponse = await request.post("/products").send(validData)
+        const response = await request.put(`/products/${productResponse.body._id}`).send(unValidData)
+        expect(response.status).toBe(400)
+
+    })
 })
 
 beforeAll((done) => {

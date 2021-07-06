@@ -12,8 +12,7 @@ productsRouter.get("/", async (req, res) => {
 
 productsRouter.get("/:productId", async (req, res) => {
     try {
-        let id = req.params.productId
-        console.log(id);
+        let id = req.params.productId;
         const product = await ProductModel.findById(id)
         if (!product) throw new Error("Invalid data")
         res.status(200).send(product)
@@ -38,5 +37,52 @@ productsRouter.post("/", async (req, res) => {
         res.status(400).send({ message: error.message })
     }
 })
+
+
+productsRouter.delete("/:productId", async (req, res) => {
+    try {
+        let id = req.params.productId
+        const product = await ProductModel.findById(id)
+        if (!product) throw new Error("Invalid data")
+        await ProductModel.findByIdAndDelete(id)
+        res.status(204).send()
+    } catch (error) {
+        res.status(404).send({ message: error.message })
+    }
+
+})
+
+productsRouter.put("/:productId", async (req, res) => {
+    try {
+        const id = req.params.productId
+        if (typeof req.body.description !== "string") throw new Error("description can be only a string")
+        const product = await ProductModel.findById(id)
+        if (!product) throw new Error("Invalid data")
+        if (product.description === req.body.description) throw new Error("add a different description plz")
+        const newProduct = await ProductModel.findByIdAndUpdate(id, req.body, {
+            runValidators: true,
+            new: true
+        })
+
+
+        res.status(201).send(newProduct)
+    } catch (error) {
+        switch (error.message) {
+            case "Invalid data":
+                res.status(404).send({ message: error.message })
+                break
+            case "add a different description plz":
+                res.status(400).send({ message: error.message })
+                break
+            case "description can be only a string":
+                res.status(400).send({ message: error.message })
+                break
+        }
+
+    }
+
+})
+
+
 
 export default productsRouter
